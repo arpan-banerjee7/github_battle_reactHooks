@@ -53,9 +53,29 @@ function ProfileList({ profile }) {
 ProfileList.propTypes = {
   profile: PropTypes.object.isRequired,
 };
+
+function battleReducer(state, action) {
+  if (action.type === "success") {
+    return {
+      winner: action.winner,
+      loser: action.loser,
+      error: null,
+      loading: false,
+    };
+  } else if (action.type === "error") {
+    return {
+      ...state,
+      error: action.message,
+      loading: false,
+    };
+  } else {
+    throw new error("This action type is not defined");
+  }
+}
+
 export default function Results(props) {
   const { playerOne, playerTwo } = queryString.parse(props.location.search);
-  const [state, setState] = React.useState({
+  const [state, dispatch] = React.useReducer(battleReducer, {
     winner: null,
     loser: null,
     error: null,
@@ -63,24 +83,22 @@ export default function Results(props) {
   });
 
   React.useEffect(() => {
+    console.log("in use effect");
     battle([playerOne, playerTwo])
       .then((players) => {
-        setState({
+        dispatch({
+          type: "success",
           winner: players[0],
           loser: players[1],
-          error: null,
-          loading: false,
         });
       })
       .catch(({ message }) => {
-        setState({
-          error: message,
-          loading: false,
-        });
+        dispatch({ type: "error", message: message });
       });
   }, [playerOne, playerTwo]);
-  const { winner, loser, error, loading } = state;
 
+  const { winner, loser, error, loading } = state;
+  console.log(winner, loser);
   if (loading === true) {
     return <Loading text="Battling" />;
   }
