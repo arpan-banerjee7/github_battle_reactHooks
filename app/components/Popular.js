@@ -113,24 +113,26 @@ export default function Popular() {
 
   const fetchedLanguages = React.useRef([]);
 
-  // React.useEffect(() => {
-  //   if (fetchedLanguages.current.includes(selectedLanguage) === false) {
-  //     fetchedLanguages.current.push(selectedLanguage);
-
-  //     fetchPopularRepos(selectedLanguage)
-  //       .then((repos) => dispatch({ type: "success", selectedLanguage, repos }))
-  //       .catch((error) => dispatch({ type: "error", error }));
-  //   }
-  // }, [fetchedLanguages, selectedLanguage]);
   React.useEffect(() => {
-    console.log("in use effect");
-    console.log(state[selectedLanguage]);
-    if (!state[selectedLanguage]) {
+    if (fetchedLanguages.current.includes(selectedLanguage) === false) {
+      fetchedLanguages.current.push(selectedLanguage);
+
       fetchPopularRepos(selectedLanguage)
         .then((repos) => dispatch({ type: "success", selectedLanguage, repos }))
         .catch((error) => dispatch({ type: "error", error }));
     }
-  }, [selectedLanguage, state]);
+  }, [fetchedLanguages, selectedLanguage]);
+
+  //my approach
+  // React.useEffect(() => {
+  //   console.log("in use effect");
+  //   console.log(state[selectedLanguage]);
+  //   if (!state[selectedLanguage]) {
+  //     fetchPopularRepos(selectedLanguage)
+  //       .then((repos) => dispatch({ type: "success", selectedLanguage, repos }))
+  //       .catch((error) => dispatch({ type: "error", error }));
+  //   }
+  // }, [selectedLanguage, state]);
 
   const isLoading = () => !state[selectedLanguage] && state.error === null;
 
@@ -138,7 +140,8 @@ export default function Popular() {
     <React.Fragment>
       <LangaugesNav
         selected={selectedLanguage}
-        onUpdateLanguage={setSelectedLanguage}
+        // onUpdateLanguage={setSelectedLanguage}
+        onUpdateLanguage={(selectedLang) => setSelectedLanguage(selectedLang)}
       />
 
       {isLoading() && <Loading text="Fetching Repos" />}
